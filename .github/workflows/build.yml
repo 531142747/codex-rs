@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.93.0
+          components: clippy, rustfmt, rust-src
+      - uses: Swatinem/rust-cache@v2
+      - name: Build release
+        run: cargo build -p codex-cli --release
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-windows-x64
+          path: target/release/codex.exe
